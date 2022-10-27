@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/jalavosus/slackthing/internal/slackthing"
+	"github.com/jalavosus/slackthing/internal/utils"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
 	"os"
@@ -11,7 +12,7 @@ import (
 
 var presenceSetterCmd = cli.Command{
 	Name:  "presence-setter",
-	Usage: "Start PresenceSetter slackthing",
+	Usage: "StartProcess PresenceSetter slackthing",
 	Flags: []cli.Flag{
 		&configFileFlag,
 	},
@@ -35,11 +36,7 @@ func startPresenceSetter(c *cli.Context) error {
 	sigChan := make(chan os.Signal)
 	signal.Notify(sigChan, os.Interrupt, os.Kill)
 
-	errCh := make(chan error, 1)
-
-	go func(ctx context.Context, thing slackthing.SlackThing, errCh chan<- error) {
-		errCh <- thing.Start(ctx)
-	}(ctx, thing, errCh)
+	errCh := utils.StartProcess(ctx, thing)
 
 	for {
 		select {

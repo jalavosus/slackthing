@@ -35,26 +35,6 @@ func (s *PresenceSetter) config() *config.PresenceSetterConfig {
 }
 
 func (s *PresenceSetter) Start(ctx context.Context) error {
-	errCh := make(chan error, 1)
-
-	go func(ctx context.Context, ch chan<- error) {
-		s.logStart()
-		ch <- s.start(ctx)
-	}(ctx, errCh)
-
-	for {
-		select {
-		case err := <-errCh:
-			if err != nil {
-				return err
-			}
-		case <-ctx.Done():
-			return nil
-		}
-	}
-}
-
-func (s *PresenceSetter) start(ctx context.Context) error {
 	var (
 		parseTimeErr error
 		setActive    utils.ParsedTime
@@ -72,6 +52,8 @@ func (s *PresenceSetter) start(ctx context.Context) error {
 	}
 
 	ticker := time.NewTicker(s.config().CheckInterval)
+
+	s.logStart()
 
 	for {
 		select {
