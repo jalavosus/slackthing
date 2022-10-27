@@ -16,7 +16,7 @@ const (
 type SlackThing interface {
 	Start(ctx context.Context) error
 	Name() string
-	logStart()
+	logStart(...zap.Field)
 }
 
 type baseSlackThing struct {
@@ -50,6 +50,6 @@ func (s *baseSlackThing) Name() string {
 	return s.name
 }
 
-func (s *baseSlackThing) logStart() {
-	s.logger.Info("starting SlackThing")
+func (s *baseSlackThing) logStart(fields ...zap.Field) {
+	s.logger.With(fields...).Info("starting SlackThing")
 }

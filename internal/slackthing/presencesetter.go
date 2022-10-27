@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	presenceSetterName string = "PresenceSetter"
+	presenceSetterName           string = "PresenceSetter"
+	defaultPresenceCheckInterval        = time.Minute
 )
 
 type PresenceSetter struct {
@@ -36,24 +37,48 @@ func (s *PresenceSetter) config() *config.PresenceSetterConfig {
 
 func (s *PresenceSetter) Start(ctx context.Context) error {
 	var (
-		parseTimeErr error
-		setActive    utils.ParsedTime
-		setAway      utils.ParsedTime
+		setActive     = utils.ParsedTime{Hour: -1}
+		setAway       = utils.ParsedTime{Hour: -1}
+		checkInterval = defaultPresenceCheckInterval
 	)
 
-	setActive, parseTimeErr = utils.ParseTime(s.config().ActiveTime)
-	if parseTimeErr != nil {
-		return parseTimeErr
+	if cfg := s.config(); cfg != nil {
+		var parseTimeErr error
+
+		if activeTime := cfg.ActiveTime; activeTime != "" {
+			setActive, parseTimeErr = utils.ParseTime(cfg.ActiveTime)
+			if parseTimeErr != nil {
+				return parseTimeErr
+			}
+		}
+
+		if awayTime := cfg.AwayTime; awayTime != "" {
+			setAway, parseTimeErr = utils.ParseTime(cfg.AwayTime)
+			if parseTimeErr != nil {
+				return parseTimeErr
+			}
+		}
+
+		if configCheckInterval := cfg.CheckInterval; configCheckInterval != time.Duration(0) {
+			checkInterval = configCheckInterval
+		}
 	}
 
-	setAway, parseTimeErr = utils.ParseTime(s.config().AwayTime)
-	if parseTimeErr != nil {
-		return parseTimeErr
+	ticker := time.NewTicker(checkInterval)
+
+	logStartFields := make([]zap.Field, 0, 3)
+
+	logStartFields = append(logStartFields, zap.String("check_interval", checkInterval.String()))
+
+	if setActive.Valid() {
+		logStartFields = append(logStartFields, zap.String("active_time", setActive.Format()))
 	}
 
-	ticker := time.NewTicker(s.config().CheckInterval)
+	if setAway.Valid() {
+		logStartFields = append(logStartFields, zap.String("away_time", setAway.Format()))
+	}
 
-	s.logStart()
+	s.logStart(logStartFields...)
 
 	for {
 		select {
@@ -95,7 +120,6 @@ func (s *PresenceSetter) doStuff(ctx context.Context, setActive, setAway utils.P
 			"error fetching current presence",
 			zap.Error(err),
 		)
-
 		return
 	}
 
@@ -117,19 +141,27 @@ func (s *PresenceSetter) doStuff(ctx context.Context, setActive, setAway utils.P
 		return
 	}
 
-	if err = s.setPresence(ctx, newPresence); err != nil {
-		s.logger.Error(
-			"error setting presence",
-			zap.Error(err),
-		)
-
-		return
+	canSet := false
+	if newPresence == slackclient.Active && setActive.Valid() {
+		canSet = true
+	} else if newPresence == slackclient.Away && setAway.Valid() {
+		canSet = true
 	}
 
-	s.logger.Info(
-		"successfully set presence",
-		zap.String("new_presence", newPresence.String()),
-	)
+	if canSet {
+		if err = s.setPresence(ctx, newPresence); err != nil {
+			s.logger.Error(
+				"error setting presence",
+				zap.Error(err),
+			)
+			return
+		}
+
+		s.logger.Info(
+			"successfully set presence",
+			zap.String("new_presence", newPresence.String()),
+		)
+	}
 
 	return
 }
