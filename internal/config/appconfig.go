@@ -13,15 +13,10 @@ type unmarshalFunc func([]byte, any) error
 
 type AppConfig struct {
 	UserId         string                `json:"user_id" yaml:"user_id"`
-	SlackConfig    SlackConfig           `json:"slack" yaml:"slack"`
 	PresenceSetter *PresenceSetterConfig `json:"presence_setter,omitempty" yaml:"presence_setter,omitempty"`
 }
 
 func validateAppConfig(c AppConfig) error {
-	if c.SlackConfig.OauthToken == "" {
-		return NewValidationError("AppConfig.SlackConfig.OauthToken", "cannot be empty")
-	}
-
 	if c.UserId == "" {
 		return NewValidationError("AppConfig.UserId", "cannot be empty")
 	}
