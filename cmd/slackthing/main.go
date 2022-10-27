@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-var logger = logging.NewLogger("cmd")
+var logger = logging.NewLoggerFromEnv("cmd")
 
 func main() {
 	app := &cli.App{

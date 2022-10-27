@@ -36,7 +36,7 @@ func newBaseSlackThing(cfg config.AppConfig, name string) (*baseSlackThing, erro
 		cfg:    cfg,
 		name:   name,
 		client: client,
-		logger: logging.NewLogger(name),
+		logger: logging.NewLoggerFromEnv(name),
 	}
 
 	return s, nil
