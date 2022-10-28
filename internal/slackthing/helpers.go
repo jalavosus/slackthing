@@ -2,9 +2,10 @@ package slackthing
 
 import (
 	"context"
+	"time"
+
 	"github.com/jalavosus/slackthing/internal/slackclient"
 	"github.com/jalavosus/slackthing/internal/utils"
-	"time"
 )
 
 func isWeekend(t time.Time) bool {

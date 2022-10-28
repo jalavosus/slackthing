@@ -7,7 +7,10 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
-const isDevEnv string = "SLACKTHING_DEV"
+const (
+	isDevEnv      string = "SLACKTHING_DEV"
+	slackTokenEnv string = "SLACK_OAUTH_TOKEN"
+)
 
 func IsDev() bool {
 	var isDev bool
@@ -25,4 +28,17 @@ func IsDev() bool {
 	}
 
 	return isDev
+}
+
+func SlackToken() string {
+	var token string
+
+	val, ok := os.LookupEnv(slackTokenEnv)
+	if ok {
+		token = val
+	} else {
+		panic(slackTokenEnv + " not found in environment")
+	}
+
+	return token
 }

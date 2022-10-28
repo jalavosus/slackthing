@@ -2,9 +2,10 @@ package slackclient
 
 import (
 	"context"
+	"time"
+
 	"github.com/pkg/errors"
 	"github.com/slack-go/slack"
-	"time"
 )
 
 type SlackClient struct {

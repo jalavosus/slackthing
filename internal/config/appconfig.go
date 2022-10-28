@@ -2,9 +2,10 @@ package config
 
 import (
 	"encoding/json"
+	"path/filepath"
+
 	"github.com/jalavosus/slackthing/internal/utils"
 	"github.com/pkg/errors"
-	"path/filepath"
 
 	"github.com/goccy/go-yaml"
 )

@@ -2,11 +2,13 @@ package slackthing
 
 import (
 	"context"
+	"time"
+
 	"github.com/jalavosus/slackthing/internal/config"
 	"github.com/jalavosus/slackthing/internal/logging"
 	"github.com/jalavosus/slackthing/internal/slackclient"
+	"github.com/jalavosus/slackthing/internal/utils"
 	"go.uber.org/zap"
-	"time"
 )
 
 const (
@@ -27,7 +29,7 @@ type baseSlackThing struct {
 }
 
 func newBaseSlackThing(cfg config.AppConfig, name string) (*baseSlackThing, error) {
-	client, err := slackclient.NewSlackClient(cfg.SlackConfig.OauthToken, cfg.UserId)
+	client, err := slackclient.NewSlackClient(utils.SlackToken(), cfg.UserId)
 	if err != nil {
 		return nil, err
 	}

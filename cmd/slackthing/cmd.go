@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
+	"os"
+	"os/signal"
+
 	"github.com/jalavosus/slackthing/internal/slackthing"
 	"github.com/jalavosus/slackthing/internal/utils"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
-	"os"
-	"os/signal"
 )
 
 var presenceSetterCmd = cli.Command{
@@ -33,7 +34,7 @@ func startPresenceSetter(c *cli.Context) error {
 	ctx, cancel := context.WithCancel(c.Context)
 	defer cancel()
 
-	sigChan := make(chan os.Signal)
+	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt, os.Kill)
 
 	errCh := utils.StartProcess(ctx, thing)

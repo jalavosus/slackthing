@@ -2,11 +2,12 @@ package main
 
 import (
 	"context"
+	"os"
+
 	"github.com/jalavosus/slackthing/internal/logging"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
-	"os"
 )
 
 var logger = logging.NewLoggerFromEnv("cmd")

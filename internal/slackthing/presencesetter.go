@@ -2,11 +2,12 @@ package slackthing
 
 import (
 	"context"
+	"time"
+
 	"github.com/jalavosus/slackthing/internal/config"
 	"github.com/jalavosus/slackthing/internal/slackclient"
 	"github.com/jalavosus/slackthing/internal/utils"
 	"go.uber.org/zap"
-	"time"
 )
 
 const (
@@ -162,6 +163,4 @@ func (s *PresenceSetter) doStuff(ctx context.Context, setActive, setAway utils.P
 			zap.String("new_presence", newPresence.String()),
 		)
 	}
-
-	return
 }
