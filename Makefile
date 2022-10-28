@@ -1,6 +1,6 @@
 GO = $(shell which go)
 
-.PHONY: ensurebin build build-linux clean lint test
+.PHONY: ensurebin build build-linux clean lint test fmt
 
 CMD_PATH = ./cmd/slackthing
 BIN_OUT = ./bin/slackthing
@@ -18,7 +18,13 @@ clean :
 	@echo "not implemented"
 
 lint :
-	@echo "not implemented"
+	@golangci-lint run --config=.golangci.yml
+
+lint-fix :
+	@golangci-lint run --config=.golangci.yml --fix
 
 test :
 	@echo "not implemented"
+
+fmt :
+	gofmt -s -w ./

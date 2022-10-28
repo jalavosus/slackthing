@@ -1,0 +1,11 @@
+name: Lint
+
+on:
+  pull_request:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  lint:
+    uses: jalavosus/workflows/.github/workflows/go-lint.yml@v1.6
